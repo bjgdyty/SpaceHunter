@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 
+@SuppressWarnings("serial")
 public class MainInterface extends JFrame implements Runnable,KeyListener{
 	
 	private BufferedImage bim = new BufferedImage(640,480,BufferedImage.TYPE_INT_ARGB);
@@ -65,7 +66,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		frameRate.calculate();
 		g.drawString(frameRate.getFrameRate(), 20, 20);
 		
-		System.out.println("rendering");
+
 		
 	}
 	
@@ -75,7 +76,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		g.drawImage(im, 0, 0, null);
 		
 		g.dispose();
-		System.out.println("painting");
+
 	}
 	
 	private void gameUpdate(){
@@ -112,13 +113,13 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	
 	public void keyPressed(KeyEvent e){
 		int keycode = e.getKeyCode();
-		if(keycode == e.VK_RIGHT){
-			player.isLooping = true;
+		if(keycode == KeyEvent.VK_RIGHT){
+			player.letMove = true;
 			picD = 1;
 			bg.canMove = true;
 			
-		}else if(keycode == e.VK_LEFT){
-			player.isLooping = true;
+		}else if(keycode == KeyEvent.VK_LEFT){
+			player.letMove = true;
 			picD = -1;
 			bg.canMove = true;
 		}
@@ -126,12 +127,12 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	
 	public void keyReleased(KeyEvent e){
 		int keycode = e.getKeyCode();
-		if(keycode == e.VK_RIGHT){
+		if(keycode == KeyEvent.VK_RIGHT){
 			bg.canMove = false;
-			player.isLooping = false;
-		}else if(keycode == e.VK_LEFT){
+			player.letMove = false;
+		}else if(keycode == KeyEvent.VK_LEFT){
 			bg.canMove = false;
-			player.isLooping = false;
+			player.letMove = false;
 		}
 	}
 	

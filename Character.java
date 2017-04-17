@@ -16,6 +16,7 @@ public class Character {
 	private int width;
 	private int height;
 	public boolean isLooping;
+	public boolean letMove;
 
 	
 	public Character(String fnm,int num){
@@ -25,12 +26,13 @@ public class Character {
 		dy = 0;
 		imFileName = fnm;
 		numImages = num;
-		animPlayer = new Animation(imFileName,numImages,800);
+		animPlayer = new Animation(imFileName,numImages,600);
 		image = animPlayer.loadImage(fnm);
 		
 		width = image.getWidth();
 		height = image.getHeight();
 		isLooping = false;
+		letMove = false;
 
 		
 	}
@@ -38,25 +40,39 @@ public class Character {
 	
 	public void moveUpdate(){
 		
-		if(isLooping){
-			locX += dx;
-			locY += dy;
-			animPlayer.updateImage();
+		if(letMove && !isLooping){
+			isLooping = true;
 		}
 		
-		
+		if(letMove && isLooping){
+			locX += dx;
+			locY += dy;
+			animPlayer.loopIms();
+		}else if(!letMove && !isLooping){
+			System.out.println("STAND");
+		}else if(!letMove && isLooping){
+			locX += dx;
+			locY += dy;
+			if(animPlayer.loopIms() == 0){
+				isLooping = false;
+			}
+			
+		}
 		
 	}
 	
 	public void draw(Graphics g){
-		if(isLooping){
+		
+		if(letMove && isLooping){
 			animPlayer.draw(g, locX, locY);
-			System.out.println("ACTIVE");
-		}else{
+		}else if(!letMove && !isLooping){
 			g.drawImage(animPlayer.ims[0], locX, locY, null);
-			System.out.println("NOT ACTIVE");
+		}else if(letMove && !isLooping){
+			System.out.println("Character draw WRONGLY");
+		}else if(!letMove && isLooping){
+			animPlayer.draw(g, locX, locY);
 		}
-			
+
 		
 	}
 	
