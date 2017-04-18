@@ -16,6 +16,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 
+@SuppressWarnings("serial")
 public class MainInterface extends JFrame implements Runnable,KeyListener{
 	
 	private BufferedImage bim = new BufferedImage(640,480,BufferedImage.TYPE_INT_ARGB);
@@ -27,6 +28,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	private Image im;
 	private Character player;
 	private int picD;
+	private TileMap tileMap;
 	
 	
 	protected void createAndShowGUI() {
@@ -60,12 +62,13 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		Graphics g = im.getGraphics();
 		bg.draw(g);
 		player.draw(g);
+		tileMap.draw(g);
 		g.setFont(new Font("Courier New",Font.PLAIN,12));
 		g.setColor(Color.BLACK);
 		frameRate.calculate();
 		g.drawString(frameRate.getFrameRate(), 20, 20);
 		
-		System.out.println("rendering");
+
 		
 	}
 	
@@ -75,14 +78,18 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		g.drawImage(im, 0, 0, null);
 		
 		g.dispose();
-		System.out.println("painting");
+
 	}
 	
 	private void gameUpdate(){
-		bg.updatePic(picD);
-		player.moveUpdate();
 		
+		player.moveUpdate(picD);
 
+		if(player.isMoving){
+			bg.updatePic(picD);
+			tileMap.updateTile(picD);
+		}
+		
 	}
 	
 	public void run(){
@@ -112,26 +119,28 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	
 	public void keyPressed(KeyEvent e){
 		int keycode = e.getKeyCode();
-		if(keycode == e.VK_RIGHT){
-			player.isLooping = true;
-			picD = 1;
-			bg.canMove = true;
+		if(keycode == KeyEvent.VK_RIGHT){
 			
-		}else if(keycode == e.VK_LEFT){
-			player.isLooping = true;
+			player.letMove = true;
+			picD = 1;
+
+			
+		}else if(keycode == KeyEvent.VK_LEFT){
+			
+			player.letMove = true;
 			picD = -1;
-			bg.canMove = true;
+
 		}
 	}
 	
 	public void keyReleased(KeyEvent e){
 		int keycode = e.getKeyCode();
-		if(keycode == e.VK_RIGHT){
-			bg.canMove = false;
-			player.isLooping = false;
-		}else if(keycode == e.VK_LEFT){
-			bg.canMove = false;
-			player.isLooping = false;
+		if(keycode == KeyEvent.VK_RIGHT){
+			player.letMove = false;
+
+		}else if(keycode == KeyEvent.VK_LEFT){
+			player.letMove = false;
+
 		}
 	}
 	
@@ -157,7 +166,8 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		bg = new Ribbon(5,bim,canvas.getWidth(),canvas.getHeight());
 		
 		player = new Character("resource/move.png",4);
-		
+		tileMap = new TileMap(0,0,canvas).loadTileMap("tilemap.txt",canvas);
+
 	}
 	
 	

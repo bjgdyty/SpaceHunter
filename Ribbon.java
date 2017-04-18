@@ -27,7 +27,7 @@ public class Ribbon {
 	private void drawRibbon(Graphics g,BufferedImage im,
 			int dx1, int dx2,int sx1,int sx2){
 		g.drawImage(im, dx1, 0, dx2, pHeight, sx1, 0, sx2, pHeight, null);
-		System.out.println("drawing ribbon");
+
 		
 	}
 	
@@ -49,12 +49,10 @@ public class Ribbon {
 	}
 	
 	public void updatePic(int d){
-		if(canMove){
-			if(d < 0){
-				xImHead = (xImHead + moveSize) % width;
-			}else if(d > 0){
-				xImHead = (xImHead - moveSize) % width;
-			}
+		if(d < 0){
+			xImHead = (xImHead + moveSize) % width;
+		}else if(d > 0){
+			xImHead = (xImHead - moveSize) % width;
 		}
 
 

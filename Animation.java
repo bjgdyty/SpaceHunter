@@ -18,6 +18,7 @@ public class Animation {
 	private long animTotalTime;
 	private int imPosition;
 	private boolean isRepeating;
+	private boolean justBegin;
 	private int numImages;
 	public BufferedImage[] ims;
 	
@@ -28,6 +29,7 @@ public class Animation {
 		
 		isRepeating = false;
 		beginning = 0;
+		justBegin = false;
 		
 		setAnimImagesFromOneFile(fnm,num);
 		numImages = num;
@@ -72,19 +74,21 @@ public class Animation {
 		}	
 	}
 	
-	public int updateImage(){
+	public int loopIms(){
+
 		lastTime = System.currentTimeMillis();
 		delta = lastTime - beginning;
 			
 		if((int) (delta / animTotalTime) > 1){
 			beginning = System.currentTimeMillis();
 		}
-
 		imPosition = (int) ((delta % animTotalTime) / showTime);
-		System.out.println(imPosition);
-
+		
 		return imPosition;
 	}
+	
+
+	
 	
 	public void draw(Graphics g,int x,int y){
 		
