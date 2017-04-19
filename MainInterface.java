@@ -17,7 +17,7 @@ import javax.swing.*;
 
 
 @SuppressWarnings("serial")
-public class MainInterface extends JFrame implements Runnable,KeyListener{
+public class MainInterface extends JFrame implements Runnable{
 	
 	private BufferedImage bim = new BufferedImage(640,480,BufferedImage.TYPE_INT_ARGB);
 	private Ribbon bg;
@@ -29,6 +29,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	private Character player;
 	private int picD;
 	private TileMap tileMap;
+	private KeyboardInput keyboard;
 	
 	
 	protected void createAndShowGUI() {
@@ -46,8 +47,8 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		
 		pack();
 		
-
-		canvas.addKeyListener(this);
+		keyboard = new KeyboardInput();
+		canvas.addKeyListener(keyboard);
 		
 		
 		
@@ -82,14 +83,14 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	}
 	
 	private void gameUpdate(){
-		
-		player.moveUpdate(picD);
-
-		if(player.isMoving){
-			bg.updatePic(picD);
-			tileMap.updateTile(picD);
+		player.moveAhead(picD);
+		if(!player.isMoving || !player.canMove){
+			picD = 0;
 		}
-		
+		player.updateJump();
+		bg.updatePic(picD);
+		tileMap.updateTile(picD);
+		System.out.println(player.getX() + "   " +player.getPY());
 	}
 	
 	public void run(){
@@ -100,7 +101,40 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		}
 	}
 	
+	private void processInput(){
+		keyboard.poll();
+		if(keyboard.keyDown(KeyEvent.VK_RIGHT)){
+			picD = 1;
+			
+		}
+		if(keyboard.keyDown(KeyEvent.VK_LEFT)){
+			picD = -1;
+			
+		}
+		if(!keyboard.keyDown(KeyEvent.VK_RIGHT)
+				&& !keyboard.keyDown(KeyEvent.VK_LEFT) && picD != 0 ){
+			System.out.println(picD);
+			if(picD == 1){
+				picD = 2;
+			}else if(picD == -1){
+				picD = -2;
+			}
+		}
+		
+		if(keyboard.keyDownOnce(KeyEvent.VK_SPACE)){
+			if(player.getPY() == 350 && !player.doJump){
+				
+				player.doJump = true;
+				player.isJumpingUP = true;
+			}
+			
+		}
+		
+		
+	}
+	
 	private void gameLoop(){
+		processInput();
 		gameUpdate();
 		gameRender();
 		gamePaint();
@@ -117,7 +151,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	}
 	
 	
-	public void keyPressed(KeyEvent e){
+/*	public void keyPressed(KeyEvent e){
 		int keycode = e.getKeyCode();
 		if(keycode == KeyEvent.VK_RIGHT){
 			
@@ -147,6 +181,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	public void keyTyped(KeyEvent e){
 		
 	}
+	*/
 	
 	private void initialize(){
 		

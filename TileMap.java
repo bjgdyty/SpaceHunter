@@ -40,6 +40,7 @@ public class TileMap {
 		offsetX = 0;
 		offsetY = pHeight - mapHeight;
 		System.out.println(mapWidth);
+		System.out.println(width);
 	}
 	
 	public int tilesToPixels(int numTiles){
@@ -66,7 +67,7 @@ public class TileMap {
 		int lastTileX = pixelsToTiles(-xMapHead + pWidth);
 		for(int y = 0;y < pixelsToTiles(mapHeight); y++){
 			for(int x = firstTileX; x <= lastTileX; x++){
-				System.out.println(x + " " + y );
+				//System.out.println(x + " " + y );
 				BufferedImage image = getTile(x,y);
 				if(image != null){
 					g.drawImage(image, tilesToPixels(x) + offsetX, tilesToPixels(y) + offsetY, null);
@@ -93,6 +94,7 @@ public class TileMap {
 			for(int i=0;i<height;i++){
 				String line = reader.readLine();
 				System.out.println(line);
+				
 				if(width == 0){
 					width = line.length();	
 				}
