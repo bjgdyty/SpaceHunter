@@ -83,7 +83,7 @@ public class Animation {
 			beginning = System.currentTimeMillis();
 		}
 		imPosition = (int) ((delta % animTotalTime) / showTime);
-		System.out.println(imPosition);
+
 		
 		return imPosition;
 	}
