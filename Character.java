@@ -7,6 +7,9 @@ public class Character {
 	
 	protected int locX;
 	protected int locY;
+	protected int x;
+	protected int y;
+	protected int Px;
 	protected int dx;
 	protected int dy;
 	protected Animation animPlayer;
@@ -15,88 +18,198 @@ public class Character {
 	private String imFileName;
 	private int width;
 	private int height;
-	public boolean isLooping;
-	public boolean letMove;
+	private final static int GRAVITY = 2;
+	private final static int INISPEED = 30;
+	private int jumpSpeed;
+	public boolean doJump;
+	public boolean isJumpingUP;
+	public boolean isMoving;
+	public boolean canMove;
+	private int CHAR_SIZE = 80;
 
 	
 	public Character(String fnm,int num){
 		locX = 300;
 		locY = 350;
-		dx = 0;
+		Px = locX;
+		x = pixelsToTiles(locX);
+		y = pixelsToTiles(locY);
+		dx = 5;
 		dy = 0;
 		imFileName = fnm;
 		numImages = num;
 		animPlayer = new Animation(imFileName,numImages,600);
 		image = animPlayer.loadImage(fnm);
-		
+		jumpSpeed = -INISPEED;
 		width = image.getWidth();
 		height = image.getHeight();
-		isLooping = false;
-		letMove = false;
+		isMoving = false;
+		canMove = true;
+		isJumpingUP = false;
+		doJump = false;
+		
+	}
+	
+	
+/*	public void moveUpdate(int moveD){
+
+		if((x ==0 && moveD <0 )|| (x == 2240 && moveD > 0)){
+			isMoving = false;
+		}else{
+
+			if(letMove && !isMoving){
+				isMoving = true;
+			}
+			
+			if(isMoving){
+				if(moveD > 0){
+					x += dx;
+				}else if(moveD < 0){
+					x -= dx;
+				}	
+			}
+
+			
+			
+			if(letMove && isMoving){
+				animPlayer.loopIms();
+			}else if(!letMove && !isMoving){
+				System.out.println("STAND");
+			}else if(!letMove && isMoving){
+				if(animPlayer.loopIms() == 0){
+					isMoving = false;
+				}
+			}
+			
+		}
+
+
+
+		
+	}*/
+	public void updateJump(){
+		if(doJump){
+			if(!isJumpingUP){
+				dy += GRAVITY;
+			}else if(isJumpingUP){
+				
+				jumpSpeed += GRAVITY;
+				setPDY(jumpSpeed);
+				if(jumpSpeed >= 0){
+					System.out.println("AT THE TOP");
+					isJumpingUP =false;
+					jumpSpeed = -INISPEED;
+				}
+			}
+			locY += dy;
+			y = pixelsToTiles(locY);
+			if(locY == 350){
+				doJump = false;
+				
+			}
+		}else if(!doJump){
+			
+		}
+
+	}
+	
+	
+	
+	public void moveAhead(int moveD){
+		
+		if((x <= 8 && moveD < 0) || (x >= 50 && moveD > 0) ){
+			System.out.println("OUT OF BOUNDARY");
+			canMove = false;
+			isMoving = false;
+		}else{
+			canMove = true;
+			if(moveD == 1){
+				if(!isMoving){
+					isMoving =true;
+				}
+				Px += dx;
+				animPlayer.loopIms();
+			}else if(moveD == -1){
+				if(!isMoving){
+					isMoving =true;
+				}
+				Px -= dx;
+				animPlayer.loopIms();
+			}else if(moveD == 2){
+				Px += dx;
+				if(animPlayer.loopIms() == 0){
+					isMoving = false;
+				}
+			}else if(moveD == -2){
+				Px -= dx;
+				if(animPlayer.loopIms() == 0){
+					isMoving = false;
+				}
+			}
+
+			x = pixelsToTiles(Px);
+		}
+		
 
 		
 	}
 	
+	public int tilesToPixels(int numTiles){
+		int pixelSize = numTiles * 48;
+		return pixelSize;
+	}
 	
-	public void moveUpdate(){
-		
-		if(letMove && !isLooping){
-			isLooping = true;
-		}
-		
-		if(letMove && isLooping){
-			locX += dx;
-			locY += dy;
-			animPlayer.loopIms();
-		}else if(!letMove && !isLooping){
-			System.out.println("STAND");
-		}else if(!letMove && isLooping){
-			locX += dx;
-			locY += dy;
-			if(animPlayer.loopIms() == 0){
-				isLooping = false;
-			}
-			
-		}
-		
+	public int pixelsToTiles(int pixelCoord){
+		int numTiles = (pixelCoord / 48);
+		return numTiles;
 	}
 	
 	public void draw(Graphics g){
-		
-		if(letMove && isLooping){
-			animPlayer.draw(g, locX, locY);
-		}else if(!letMove && !isLooping){
+		if(canMove){
+			if(isMoving){
+				animPlayer.draw(g, locX, locY);
+				
+				//System.out.println("CHARACTER  " + pixelsToTiles(x) + "    " + y);
+			}else if(!isMoving){
+				g.drawImage(animPlayer.ims[0], locX, locY, null);
+			}
+		}else if(!canMove){
 			g.drawImage(animPlayer.ims[0], locX, locY, null);
-		}else if(letMove && !isLooping){
-			System.out.println("Character draw WRONGLY");
-		}else if(!letMove && isLooping){
-			animPlayer.draw(g, locX, locY);
 		}
+
+		/*else if(!letMove && !isMoving){
+			g.drawImage(animPlayer.ims[0], locX, locY, null);
+		}else if(letMove && !isMoving){
+			System.out.println("CANNOT MOVE");
+			g.drawImage(animPlayer.ims[0], locX, locY, null);
+		}else if(!letMove && isMoving){
+			animPlayer.draw(g, locX, locY);
+		}*/
 
 		
 	}
 	
 	public void setX(int x){
-		locX = x;
+		this.x = x;
 	}
 	
 	public void setY(int y){
-		locY = y;
+		this.y = y;
 	}
 	
 	public int getX(){
-		return locX;
+		return x;
 	}
 	
-	public int getY(){
+	public int getPY(){
 		return locY;
 	}
 	
-	public void setDX(int dx){
+	public void setPDX(int dx){
 		this.dx = dx;
 	};
 	
-	public void setDY(int dy){
+	public void setPDY(int dy){
 		this.dy = dy;
 	}
 	

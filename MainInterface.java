@@ -17,7 +17,7 @@ import javax.swing.*;
 
 
 @SuppressWarnings("serial")
-public class MainInterface extends JFrame implements Runnable,KeyListener{
+public class MainInterface extends JFrame implements Runnable{
 	
 	private BufferedImage bim = new BufferedImage(640,480,BufferedImage.TYPE_INT_ARGB);
 	private Ribbon bg;
@@ -28,6 +28,8 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	private Image im;
 	private Character player;
 	private int picD;
+	private TileMap tileMap;
+	private KeyboardInput keyboard;
 	
 	
 	protected void createAndShowGUI() {
@@ -45,8 +47,8 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		
 		pack();
 		
-
-		canvas.addKeyListener(this);
+		keyboard = new KeyboardInput();
+		canvas.addKeyListener(keyboard);
 		
 		
 		
@@ -61,6 +63,7 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		Graphics g = im.getGraphics();
 		bg.draw(g);
 		player.draw(g);
+		tileMap.draw(g);
 		g.setFont(new Font("Courier New",Font.PLAIN,12));
 		g.setColor(Color.BLACK);
 		frameRate.calculate();
@@ -80,10 +83,14 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	}
 	
 	private void gameUpdate(){
+		player.moveAhead(picD);
+		if(!player.isMoving || !player.canMove){
+			picD = 0;
+		}
+		player.updateJump();
 		bg.updatePic(picD);
-		player.moveUpdate();
-		
-
+		tileMap.updateTile(picD);
+		System.out.println(player.getX() + "   " +player.getPY());
 	}
 	
 	public void run(){
@@ -94,7 +101,40 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		}
 	}
 	
+	private void processInput(){
+		keyboard.poll();
+		if(keyboard.keyDown(KeyEvent.VK_RIGHT)){
+			picD = 1;
+			
+		}
+		if(keyboard.keyDown(KeyEvent.VK_LEFT)){
+			picD = -1;
+			
+		}
+		if(!keyboard.keyDown(KeyEvent.VK_RIGHT)
+				&& !keyboard.keyDown(KeyEvent.VK_LEFT) && picD != 0 ){
+			System.out.println(picD);
+			if(picD == 1){
+				picD = 2;
+			}else if(picD == -1){
+				picD = -2;
+			}
+		}
+		
+		if(keyboard.keyDownOnce(KeyEvent.VK_SPACE)){
+			if(player.getPY() == 350 && !player.doJump){
+				
+				player.doJump = true;
+				player.isJumpingUP = true;
+			}
+			
+		}
+		
+		
+	}
+	
 	private void gameLoop(){
+		processInput();
 		gameUpdate();
 		gameRender();
 		gamePaint();
@@ -111,34 +151,37 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 	}
 	
 	
-	public void keyPressed(KeyEvent e){
+/*	public void keyPressed(KeyEvent e){
 		int keycode = e.getKeyCode();
 		if(keycode == KeyEvent.VK_RIGHT){
+			
 			player.letMove = true;
 			picD = 1;
-			bg.canMove = true;
+
 			
 		}else if(keycode == KeyEvent.VK_LEFT){
+			
 			player.letMove = true;
 			picD = -1;
-			bg.canMove = true;
+
 		}
 	}
 	
 	public void keyReleased(KeyEvent e){
 		int keycode = e.getKeyCode();
 		if(keycode == KeyEvent.VK_RIGHT){
-			bg.canMove = false;
 			player.letMove = false;
+
 		}else if(keycode == KeyEvent.VK_LEFT){
-			bg.canMove = false;
 			player.letMove = false;
+
 		}
 	}
 	
 	public void keyTyped(KeyEvent e){
 		
 	}
+	*/
 	
 	private void initialize(){
 		
@@ -158,7 +201,8 @@ public class MainInterface extends JFrame implements Runnable,KeyListener{
 		bg = new Ribbon(5,bim,canvas.getWidth(),canvas.getHeight());
 		
 		player = new Character("resource/move.png",4);
-		
+		tileMap = new TileMap(0,0,canvas).loadTileMap("tilemap.txt",canvas);
+
 	}
 	
 	
