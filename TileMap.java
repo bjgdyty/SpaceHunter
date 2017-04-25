@@ -1,4 +1,4 @@
-package display;
+package gamecore;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
@@ -34,13 +34,21 @@ public class TileMap {
 		xMapHead = 0;
 		pWidth = screen.getWidth();
 		pHeight = screen.getHeight();
-		mapMoveSize = 5;
+		mapMoveSize = 4;
 		mapWidth = tilesToPixels(width);
 		mapHeight = tilesToPixels(height);
 		offsetX = 0;
 		offsetY = pHeight - mapHeight;
 		System.out.println(mapWidth);
 		System.out.println(width);
+	}
+	
+	public int offsetX(){
+		return offsetX;
+	}
+	
+	public int offsetY(){
+		return offsetY;
 	}
 	
 	public int tilesToPixels(int numTiles){
@@ -67,6 +75,7 @@ public class TileMap {
 		int lastTileX = pixelsToTiles(-xMapHead + pWidth);
 		for(int y = 0;y < pixelsToTiles(mapHeight); y++){
 			for(int x = firstTileX; x <= lastTileX; x++){
+				
 				//System.out.println(x + " " + y );
 				BufferedImage image = getTile(x,y);
 				if(image != null){
@@ -76,8 +85,8 @@ public class TileMap {
 		}
 	}
 	
-	private BufferedImage getTile(int x,int y){
-		return tiles[x][y];
+	public BufferedImage getTile(int x,int y){
+		return tiles[x][y]; 
 	}
 	
 	private void setTile(int x,int y,BufferedImage image){

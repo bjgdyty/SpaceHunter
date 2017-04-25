@@ -15,6 +15,12 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import gamecore.Character;
+import gamecore.FrameRate;
+import gamecore.GameWorldManager;
+import gamecore.Ribbon;
+import gamecore.TileMap;
+
 
 @SuppressWarnings("serial")
 public class MainInterface extends JFrame implements Runnable{
@@ -30,6 +36,7 @@ public class MainInterface extends JFrame implements Runnable{
 	private int picD;
 	private TileMap tileMap;
 	private KeyboardInput keyboard;
+	private GameWorldManager manager;
 	
 	
 	protected void createAndShowGUI() {
@@ -49,6 +56,7 @@ public class MainInterface extends JFrame implements Runnable{
 		
 		keyboard = new KeyboardInput();
 		canvas.addKeyListener(keyboard);
+		
 		
 		
 		
@@ -84,13 +92,16 @@ public class MainInterface extends JFrame implements Runnable{
 	
 	private void gameUpdate(){
 		player.moveAhead(picD);
+		player.updateJump();
+		System.out.println(player.onGround);
+		manager.worldCollisionVertical(player);		
+
 		if(!player.isMoving || !player.canMove){
 			picD = 0;
 		}
-		player.updateJump();
 		bg.updatePic(picD);
 		tileMap.updateTile(picD);
-		System.out.println(player.getX() + "   " +player.getPY());
+		System.out.println(player.getPX() + "   " +player.getPY());
 	}
 	
 	public void run(){
@@ -113,7 +124,7 @@ public class MainInterface extends JFrame implements Runnable{
 		}
 		if(!keyboard.keyDown(KeyEvent.VK_RIGHT)
 				&& !keyboard.keyDown(KeyEvent.VK_LEFT) && picD != 0 ){
-			System.out.println(picD);
+			
 			if(picD == 1){
 				picD = 2;
 			}else if(picD == -1){
@@ -122,10 +133,10 @@ public class MainInterface extends JFrame implements Runnable{
 		}
 		
 		if(keyboard.keyDownOnce(KeyEvent.VK_SPACE)){
-			if(player.getPY() == 350 && !player.doJump){
-				
-				player.doJump = true;
+			if(player.onGround != 0 && !player.doJump){
 				player.isJumpingUP = true;
+				player.doJump = true;
+				
 			}
 			
 		}
@@ -198,10 +209,11 @@ public class MainInterface extends JFrame implements Runnable{
 			e.printStackTrace();
 		}
 		
-		bg = new Ribbon(5,bim,canvas.getWidth(),canvas.getHeight());
+		bg = new Ribbon(4,bim,canvas.getWidth(),canvas.getHeight());
 		
 		player = new Character("resource/move.png",4);
 		tileMap = new TileMap(0,0,canvas).loadTileMap("tilemap.txt",canvas);
+		manager = new GameWorldManager(tileMap);
 
 	}
 	

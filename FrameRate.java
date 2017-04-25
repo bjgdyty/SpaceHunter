@@ -1,4 +1,4 @@
-package display;
+package gamecore;
 
 public class FrameRate {
 	private String frameRate;

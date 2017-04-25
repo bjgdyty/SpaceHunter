@@ -1,14 +1,14 @@
-package display;
+package gamecore;
 
 import java.awt.Graphics;
 import java.awt.image.*;
+
+import display.Animation;
 
 public class Character {
 	
 	protected int locX;
 	protected int locY;
-	protected int x;
-	protected int y;
 	protected int Px;
 	protected int dx;
 	protected int dy;
@@ -18,23 +18,24 @@ public class Character {
 	private String imFileName;
 	private int width;
 	private int height;
-	private final static int GRAVITY = 2;
-	private final static int INISPEED = 30;
+	private final static int GRAVITY = 1;
+	private final static int INISPEED = 16;
 	private int jumpSpeed;
 	public boolean doJump;
 	public boolean isJumpingUP;
 	public boolean isMoving;
 	public boolean canMove;
+	public int onGround;
 	private int CHAR_SIZE = 80;
 
 	
 	public Character(String fnm,int num){
-		locX = 300;
-		locY = 350;
+		width = 80;
+		height = 80;
+		locX = 400;
+		locY = 198;
 		Px = locX;
-		x = pixelsToTiles(locX);
-		y = pixelsToTiles(locY);
-		dx = 5;
+		dx = 4;
 		dy = 0;
 		imFileName = fnm;
 		numImages = num;
@@ -47,7 +48,15 @@ public class Character {
 		canMove = true;
 		isJumpingUP = false;
 		doJump = false;
-		
+		onGround = 2;
+	}
+	
+	public int getWidth(){
+		return width;
+	}
+	
+	public int getHeight(){
+		return height;
 	}
 	
 	
@@ -89,6 +98,10 @@ public class Character {
 	}*/
 	public void updateJump(){
 		if(doJump){
+			if(onGround == 2){
+				onGround = 0;
+
+			}
 			if(!isJumpingUP){
 				dy += GRAVITY;
 			}else if(isJumpingUP){
@@ -102,11 +115,7 @@ public class Character {
 				}
 			}
 			locY += dy;
-			y = pixelsToTiles(locY);
-			if(locY == 350){
-				doJump = false;
-				
-			}
+
 		}else if(!doJump){
 			
 		}
@@ -117,7 +126,7 @@ public class Character {
 	
 	public void moveAhead(int moveD){
 		
-		if((x <= 8 && moveD < 0) || (x >= 50 && moveD > 0) ){
+		if((Px <= 380 && moveD < 0) || (Px >= 2400 && moveD > 0) ){
 			System.out.println("OUT OF BOUNDARY");
 			canMove = false;
 			isMoving = false;
@@ -146,15 +155,13 @@ public class Character {
 					isMoving = false;
 				}
 			}
-
-			x = pixelsToTiles(Px);
 		}
 		
 
 		
 	}
 	
-	public int tilesToPixels(int numTiles){
+/*	public int tilesToPixels(int numTiles){
 		int pixelSize = numTiles * 48;
 		return pixelSize;
 	}
@@ -162,14 +169,14 @@ public class Character {
 	public int pixelsToTiles(int pixelCoord){
 		int numTiles = (pixelCoord / 48);
 		return numTiles;
-	}
+	}*/
 	
 	public void draw(Graphics g){
 		if(canMove){
 			if(isMoving){
 				animPlayer.draw(g, locX, locY);
 				
-				//System.out.println("CHARACTER  " + pixelsToTiles(x) + "    " + y);
+				System.out.println("CHARACTER  " +(Px) + "    " + locY);
 			}else if(!isMoving){
 				g.drawImage(animPlayer.ims[0], locX, locY, null);
 			}
@@ -189,20 +196,28 @@ public class Character {
 		
 	}
 	
-	public void setX(int x){
-		this.x = x;
+	public void setPX(int Px){
+		this.Px = Px;
 	}
 	
-	public void setY(int y){
-		this.y = y;
+	public void setPY(int Py){
+		this.locY = Py;
 	}
 	
-	public int getX(){
-		return x;
+	public int getPX(){
+		return Px;
 	}
 	
 	public int getPY(){
 		return locY;
+	}
+	
+	public int getDY(){
+		return dy;
+	}
+	
+	public int getDX(){
+		return dx;
 	}
 	
 	public void setPDX(int dx){

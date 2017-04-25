@@ -1,4 +1,4 @@
-package display;
+package gamecore;
 
 import java.awt.*;
 import java.awt.image.*;
