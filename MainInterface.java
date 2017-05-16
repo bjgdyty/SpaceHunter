@@ -37,7 +37,7 @@ public class MainInterface extends JFrame implements Runnable{
 	private TileMap tileMap;
 	private KeyboardInput keyboard;
 	private GameWorldManager manager;
-	
+	private Menu menu;
 	
 	protected void createAndShowGUI() {
 		
@@ -57,7 +57,12 @@ public class MainInterface extends JFrame implements Runnable{
 		keyboard = new KeyboardInput();
 		canvas.addKeyListener(keyboard);
 		
+		menu = new Menu(this);
 		
+		this.setLayout(null);
+		this.add(menu);
+		
+		menu.setVisible(false);
 		
 		
 		setVisible(true);
@@ -73,7 +78,7 @@ public class MainInterface extends JFrame implements Runnable{
 		player.draw(g);
 		tileMap.draw(g);
 		g.setFont(new Font("Courier New",Font.PLAIN,12));
-		g.setColor(Color.BLACK);
+		g.setColor(Color.WHITE);
 		frameRate.calculate();
 		g.drawString(frameRate.getFrameRate(), 20, 20);
 		
@@ -106,10 +111,21 @@ public class MainInterface extends JFrame implements Runnable{
 	
 	public void run(){
 		initialize();
-		running = true;
-		while(running){
-			gameLoop();
+		
+		while(true){
+			while(running){
+				processInput();
+				menu.setVisible(false);
+				canvas.setVisible(true);
+				gameLoop();
+			}
+			while(!running){
+				processInput();
+				canvas.setVisible(false);
+				menu.setVisible(true);
+			}
 		}
+
 	}
 	
 	private void processInput(){
@@ -141,16 +157,21 @@ public class MainInterface extends JFrame implements Runnable{
 			
 		}
 		
+		if(keyboard.keyDownOnce(KeyEvent.VK_ESCAPE)){
+			running = !running;
+			
+		}
+		
 		
 	}
 	
 	private void gameLoop(){
-		processInput();
+		
 		gameUpdate();
 		gameRender();
 		gamePaint();
 		
-		sleep(9L);
+		sleep(7L);
 		
 		
 	}
@@ -203,7 +224,8 @@ public class MainInterface extends JFrame implements Runnable{
 
 		try {
 			bim = ImageIO.read(new BufferedInputStream(
-					new FileInputStream("resource/ribbontest.png")));
+					new FileInputStream("resource/ribbonLong.png")));
+			
 		} catch (IOException e) {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
@@ -214,9 +236,13 @@ public class MainInterface extends JFrame implements Runnable{
 		player = new Character("resource/move.png",4);
 		tileMap = new TileMap(0,0,canvas).loadTileMap("tilemap.txt",canvas);
 		manager = new GameWorldManager(tileMap);
+		running = true;
 
 	}
 	
+	public void setRunning(){
+		running = true;
+	}
 	
 	public static void main(String[] args) {
 		final MainInterface app = new MainInterface();
