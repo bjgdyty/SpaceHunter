@@ -38,7 +38,8 @@ public class MainInterface extends JFrame implements Runnable{
 	private KeyboardInput keyboard;
 	private GameWorldManager manager;
 	private Menu menu;
-	
+	private firstMenu firstMenu;
+	private volatile boolean start;
 	protected void createAndShowGUI() {
 		
 		canvas = new Canvas();
@@ -57,13 +58,16 @@ public class MainInterface extends JFrame implements Runnable{
 		keyboard = new KeyboardInput();
 		canvas.addKeyListener(keyboard);
 		
+		firstMenu = new firstMenu(this);
 		menu = new Menu(this);
 		
 		this.setLayout(null);
 		this.add(menu);
-		
 		menu.setVisible(false);
 		
+		
+		this.add(firstMenu);
+		firstMenu.setVisible(false);
 		
 		setVisible(true);
 		gameThread = new Thread(this);
@@ -110,22 +114,29 @@ public class MainInterface extends JFrame implements Runnable{
 	}
 	
 	public void run(){
+		
 		initialize();
 		
 		while(true){
-			while(running){
-				processInput();
-				menu.setVisible(false);
-				canvas.setVisible(true);
-				gameLoop();
-			}
-			while(!running){
-				processInput();
+			if(start == false){
 				canvas.setVisible(false);
-				menu.setVisible(true);
+				firstMenu.setVisible(true);
+			}else if(start == true){
+				firstMenu.setVisible(false);
+					while(running){
+						processInput();
+						menu.setVisible(false);
+						canvas.setVisible(true);
+						gameLoop();
+					}
+					while(!running){
+						processInput();
+						canvas.setVisible(false);
+						menu.setVisible(true);
+					}
+							
 			}
 		}
-
 	}
 	
 	private void processInput(){
@@ -236,11 +247,14 @@ public class MainInterface extends JFrame implements Runnable{
 		player = new Character("resource/move.png",4);
 		tileMap = new TileMap(0,0,canvas).loadTileMap("tilemap.txt",canvas);
 		manager = new GameWorldManager(tileMap);
-		running = true;
-
+		running = false;
+		start = false;
 	}
 	
 	public void setRunning(){
+		if(start == false){
+			start = true;
+		}
 		running = true;
 	}
 	
